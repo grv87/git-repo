@@ -54,9 +54,10 @@ from main import WrapperModule
 from project import Project
 from project import RemoteSpec
 from command import Command, MirrorSafeCommand
-from error import RepoChangedException, GitError, ManifestParseError
+from error import RepoChangedException, GitError, ManifestParseError, HookError
 from project import SyncBuffer
 from progress import Progress
+from project import RepoHook
 
 _ONE_DAY_S = 24 * 60 * 60
 
@@ -658,6 +659,16 @@ later is required to fix a server side protocol bug.
         print(file=sys.stderr)
         if not syncbuf.Finish():
             sys.exit(1)
+
+        hook = RepoHook('post-sync', self.manifest.repo_hooks_project,
+                        self.manifest.topdir,
+                        self.manifest.manifestProject.GetRemote('origin').url,
+                        abort_if_user_denies=True)
+        try:
+            hook.Run(False)
+        except HookError as e:
+            print("ERROR: %s" % str(e), file=sys.stderr)
+            return
 
         # If there's a notice that's supposed to print at the end of the sync, print
         # it now...
