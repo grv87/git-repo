@@ -87,6 +87,23 @@ be useful when deploying automatic fixes.
 
 Here are all the points available for hooking.
 
+### post-sync
+
+This hook runs when people run `repo sync`.
+
+The `post-sync.py` file should be defined like:
+
+```py
+def main(**kwargs):
+    """Main function invoked directly by repo.
+
+    We must use the name "main" as that is what repo requires.
+
+    Args:
+      kwargs: Leave this here for forward-compatibility.
+    """
+```
+
 ### pre-upload
 
 This hook runs when people run `repo upload`.
